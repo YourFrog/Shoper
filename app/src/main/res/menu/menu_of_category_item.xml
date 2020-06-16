@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group android:id="@+id/category_options">
+        <item
+                android:id="@+id/add_product"
+                android:icon="@drawable/ic_add"
+                android:orderInCategory="100"
+                android:title="@string/add"
+                app:showAsAction="never" />
+        <item
+                android:id="@+id/clone"
+                android:icon="@drawable/ic_add"
+                android:orderInCategory="100"
+                android:title="@string/clone"
+                app:showAsAction="never" />
+        <item
+                android:id="@+id/edit"
+                android:icon="@drawable/ic_add"
+                android:orderInCategory="100"
+                android:title="@string/edit"
+                app:showAsAction="never" />
+        <item
+                android:id="@+id/remove"
+                android:icon="@drawable/ic_bin"
+                android:orderInCategory="200"
+                android:title="@string/remove"
+                app:showAsAction="never" />
+    </group>
+</menu>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group android:id="@+id/category_options">
+        <item
+                android:id="@+id/bought"
+                android:orderInCategory="200"
+                android:title="@string/product_menu_bought"
+                app:showAsAction="never" />
+        <item
+                android:id="@+id/waiting"
+                android:orderInCategory="200"
+                android:title="@string/product_menu_waiting"
+                app:showAsAction="never" />
+        <item
+                android:id="@+id/part"
+                android:orderInCategory="200"
+                android:title="@string/product_menu_part"
+                app:showAsAction="never" />
+        <item
+                android:id="@+id/no_found"
+                android:orderInCategory="200"
+                android:title="@string/product_menu_no_found"
+                app:showAsAction="never" />
+        <item
+                android:id="@+id/edit"
+                android:orderInCategory="200"
+                android:title="@string/edit"
+                app:showAsAction="never" />
+        <item
+                android:id="@+id/remove"
+                android:orderInCategory="200"
+                android:title="@string/remove"
+                app:showAsAction="always" />
+    </group>
+</menu>

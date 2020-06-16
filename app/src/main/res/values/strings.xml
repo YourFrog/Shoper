@@ -1,0 +1,68 @@
+<resources>
+    <string name="app_name">Shoper</string>
+    <string name="categories_title">Lista zakupów</string>
+
+    <string name="qrcode_generate_title">QR Code: %s</string>
+    <string name="category_title_create">Tworzenie listy</string>
+    <string name="category_title_edit">Edycja listy</string>
+
+    <string name="product_title_create">Tworzenie produktu</string>
+    <string name="product_title_edit">Edycja produktu</string>
+
+    <string name="new_list">Nowa lista</string>
+    <string name="scanner_qr">Zeskanuj QR Code</string>
+    <string name="settings">Ustawienia</string>
+
+    <string name="category_title_name">Nazwa kategorii</string>
+    <string name="category_title_description">Opis</string>
+    <string name="category_button_save">Zapisz</string>
+    <string name="category_button_cancel">Anuluj</string>
+
+    <string name="product_title_name">Nazwa Produktu</string>
+    <string name="product_title_weight">Jednostka miary</string>
+    <string name="product_title_amount">Ilość</string>
+    <string name="product_hint_weight">Kliknij aby wybrać</string>
+    <string name="product_button_save">Zapisz</string>
+    <string name="product_button_cancel">Anuluj</string>
+
+    <string name="clone_category_name">%s - Kopia</string>
+    <string name="remove">Usuń</string>
+    <string name="up">W górę</string>
+    <string name="add">Dodaj produkt</string>
+    <string name="edit">Edytuj</string>
+    <string name="clone">Sklonuj</string>
+    <string name="down">W dół</string>
+    <string name="unselect">Odznacz</string>
+    <string name="category_elements">Elementów %d</string>
+
+    <string name="picker_select_weight">Wybierz jednostkę miary</string>
+
+    <string name="weight_piece">%s Sztuk</string>
+    <string name="weight_kilo">%s Kilogramów</string>
+    <string name="weight_grams">%s Gramów</string>
+    <string name="weight_litr">%s Litrów</string>
+
+    <string name="weight_display_name_piece">Sztuki</string>
+    <string name="weight_display_name_kilograms">Kilogramy</string>
+    <string name="weight_display_name_grams">Gramy</string>
+    <string name="weight_display_name_litr">Litry</string>
+
+    <string name="product_menu_bought">Kupione</string>
+    <string name="product_menu_waiting">Do kupienia</string>
+    <string name="product_menu_part">Częściowo kupione</string>
+    <string name="product_menu_no_found">Brak w sklepie</string>
+
+    <string name="product_status_waiting">Produkty do zakupienia</string>
+    <string name="product_status_complete">Produkty zakupione</string>
+    <string name="product_status_not_found">Brak produktów</string>
+    <string name="product_status_part">Częściowo kupione</string>
+
+    <string name="product_error_no_product_weight">Wybierz jednostkę miary produktu</string>
+    <string name="product_error_no_product_name">Wprowadź nazwę produktu</string>
+    <string name="product_error_no_amount">Wprowadź ilość</string>
+
+    <string name="not_define_any_category">Brak zdefiniowanych list zakupów</string>
+
+
+    <string name="ok">OK</string>
+</resources>
