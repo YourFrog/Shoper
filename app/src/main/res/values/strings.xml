@@ -2,6 +2,8 @@
     <string name="app_name">Shoper</string>
     <string name="categories_title">Lista zakupów</string>
 
+    <string name="title_clone">Kopiowanie listy \"%s\"</string>
+
     <string name="qrcode_generate_title">QR Code: %s</string>
     <string name="category_title_create">Tworzenie listy</string>
     <string name="category_title_edit">Edycja listy</string>
@@ -10,6 +12,7 @@
     <string name="product_title_edit">Edycja produktu</string>
 
     <string name="new_list">Nowa lista</string>
+    <string name="scanner_ean">Zeskanuj EAN</string>
     <string name="scanner_qr">Zeskanuj QR Code</string>
     <string name="settings">Ustawienia</string>
 
@@ -47,6 +50,11 @@
     <string name="weight_display_name_grams">Gramy</string>
     <string name="weight_display_name_litr">Litry</string>
 
+    <string name="weight_display_short_piece">szt.</string>
+    <string name="weight_display_short_kilograms">Kg</string>
+    <string name="weight_display_short_grams">g</string>
+    <string name="weight_display_short_litr">L</string>
+
     <string name="product_menu_bought">Kupione</string>
     <string name="product_menu_waiting">Do kupienia</string>
     <string name="product_menu_part">Częściowo kupione</string>
@@ -63,6 +71,22 @@
 
     <string name="not_define_any_category">Brak zdefiniowanych list zakupów</string>
 
+    <string name="clone_all_products_in_list">Które elementy listy skopiować?</string>
+    <string name="clone_all_products_in_list_all">Wszystkie</string>
+    <string name="clone_all_products_in_list_selected">Wybrane</string>
 
+    <string name="copy_list_information">Tylko zaznaczone elementy pojawią się na skopiowanej liście</string>
+    <string name="copy_check_element">Dopiero po zaznaczeniu elementu można zmieniać jego ilość</string>
+
+    <string name="exit_clone_message">Czy napewno chcesz opuścić ekran kopiowania listy? Wyjście bez zapisania spowoduje utratę wykonanych czynności!</string>
+    <string name="exit_clone_message_yes">Wyjdź</string>
+    <string name="exit_clone_message_no">Pozostań</string>
+    <string name="error_clone_empty_list">Kopiowana lista nie może być pusta. Zaznacz przynajmniej jeden element.</string>
+
+    <string name="local_ean_not_found">Nie oznaleziono kodu %s. Czy chcesz go wprowadzić do aplikacji?</string>
+    <string name="button_complete">Zakończ</string>
     <string name="ok">OK</string>
+
+    <string name="yes">Tak</string>
+    <string name="no">Nie</string>
 </resources>

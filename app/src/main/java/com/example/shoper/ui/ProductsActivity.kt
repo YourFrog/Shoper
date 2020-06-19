@@ -10,16 +10,22 @@ import androidx.databinding.DataBindingUtil
 import com.example.shoper.AppDatabase
 import com.example.shoper.R
 import com.example.shoper.databinding.ActivityProductsBinding
+import com.example.shoper.entity.CatalogProduct
 import com.example.shoper.entity.Product
 import com.example.shoper.model.Category
+import com.example.shoper.model.EAN
 import com.example.shoper.model.ProductStatus
 import com.example.shoper.model.ShopList
 import com.example.shoper.repository.merge
 import com.example.shoper.ui.item.ProductItem
+import com.example.shoper.utils.popup
+import com.google.gson.Gson
+import com.google.zxing.integration.android.IntentIntegrator
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.addTo
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
 /**
@@ -47,6 +53,14 @@ class ProductsActivity : BaseActivity() {
             CreateOrUpdateProductActivity.launchForResult(this@ProductsActivity, REQUEST_NEW_OR_EDIT_PRODUCT_CODE, shopList.category)
         }
 
+        binding.scanProduct.setOnClickListener {
+            IntentIntegrator(this)
+                .setBeepEnabled(false)
+                .setRequestCode(REQUEST_QR_SCANNER_CODE)
+                .setDesiredBarcodeFormats(IntentIntegrator.EAN_13, IntentIntegrator.EAN_8)
+                .initiateScan()
+        }
+
         setupView()
     }
 
@@ -65,6 +79,28 @@ class ProductsActivity : BaseActivity() {
                     AppDatabase.getInstance(applicationContext).productDao().merge(product).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
                         setupView()
                     }, ::handleError)
+
+                    product.ean?.let {
+                        // We have ean so add him to database
+                        AppDatabase.getInstance(applicationContext).catalogProductDao().oneByEan(it).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeBy(
+                            onSuccess = {
+                                AppDatabase.getInstance(applicationContext).catalogProductDao().merge(
+                                    it.copy(
+                                        name = product.name,
+                                        weightType = product.weightType
+                                    )).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({}, ::handleError)
+                            },
+                            onComplete = {
+                                AppDatabase.getInstance(applicationContext).catalogProductDao().insert(
+                                    CatalogProduct(
+                                    name = product.name,
+                                    ean = it,
+                                    weightType = product.weightType
+                                )).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({}, ::handleError)
+                            },
+                            onError = ::handleError
+                        )
+                    }
                 }
             }
             REQUEST_EDIT_CATEGORY_CODE -> {
@@ -77,6 +113,46 @@ class ProductsActivity : BaseActivity() {
                             setupView()
                         }, ::handleError)
                 }
+            }
+            MainActivity.REQUEST_QR_SCANNER_CODE -> {
+                IntentIntegrator.parseActivityResult(resultCode, data)?.let {
+
+                    if( it.contents != null ) {
+                        val eanValue = it.contents
+
+                        AppDatabase.getInstance(applicationContext).catalogProductDao().oneByEan(eanValue).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeBy(
+                            onSuccess = {
+                                // Open product activity to add
+                                CreateOrUpdateProductActivity.launchForResult(
+                                    this@ProductsActivity,
+                                    REQUEST_NEW_OR_EDIT_PRODUCT_CODE,
+                                    Product(
+                                        name = it.name,
+                                        weightType = it.weightType,
+                                        categoryID = shopList.category.id,
+                                        ean = it.ean,
+                                        amount = 1.toString()
+                                    )
+                                )
+                            },
+                            onComplete = {
+                                val ean = EAN(eanValue)
+
+                                popup().showMessageYesOrNo(getString(R.string.local_ean_not_found, ean.format()), onYes = {
+                                    // Open Next activity for product
+                                    CreateOrUpdateProductActivity.launchForResult(
+                                        this@ProductsActivity,
+                                        REQUEST_NEW_OR_EDIT_PRODUCT_CODE,
+                                        shopList.category,
+                                        ean)
+                                })
+                            },
+                            onError = ::handleError
+                        )
+                    }
+                }
+                val xx = 0
+
             }
         }
     }
@@ -214,6 +290,7 @@ class ProductsActivity : BaseActivity() {
     companion object {
         const val REQUEST_NEW_OR_EDIT_PRODUCT_CODE = 10
         const val REQUEST_EDIT_CATEGORY_CODE = 20
+        const val REQUEST_QR_SCANNER_CODE = 30
         const val INTENT_CATEGORY_ID = "id_category"
 
         fun launch(context: Context, shopList: ShopList) {

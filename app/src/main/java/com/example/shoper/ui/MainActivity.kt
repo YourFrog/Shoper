@@ -16,6 +16,7 @@ import com.example.shoper.entity.Product
 import com.example.shoper.model.ShopList
 import com.example.shoper.repository.merge
 import com.example.shoper.ui.item.CategoryItem
+import com.example.shoper.utils.popup
 import com.google.gson.Gson
 import com.google.zxing.integration.android.IntentIntegrator
 import com.mikepenz.fastadapter.FastAdapter
@@ -54,7 +55,11 @@ class MainActivity : BaseActivity() {
     }
 
     fun handleCloneCategory(item: CategoryItem) {
-        cloneShopList(item.shopList.category, item.shopList.products)
+        popup().showMessageYesOrNo(R.string.clone_all_products_in_list, R.string.clone_all_products_in_list_all, R.string.clone_all_products_in_list_selected, onYes = {
+            cloneShopList(item.shopList.category, item.shopList.products)
+        }, onNo = {
+            CloneShopListActivity.launchForResult(this, REQUEST_CLONE_LIST_CODE, item.shopList)
+        })
     }
 
     fun cloneShopList(oldCategory: Category, oldProducts: List<Product>) {
@@ -175,6 +180,14 @@ class MainActivity : BaseActivity() {
                 val xx = 0
 
             }
+            REQUEST_CLONE_LIST_CODE -> {
+                data?.let {
+                    val products = CloneShopListActivity.getProducts(it)
+                    val category = CloneShopListActivity.getCategory(it)
+
+                    cloneShopList(category, products)
+                }
+            }
         }
     }
 
@@ -208,6 +221,7 @@ class MainActivity : BaseActivity() {
         const val REQUEST_NEW_OR_EDIT_CATEGORY_CODE = 10
         const val REQUEST_NEW_PRODUCT_CODE = 20
         const val REQUEST_QR_SCANNER_CODE = 30
+        const val REQUEST_CLONE_LIST_CODE = 40
 
         fun launch(context: Context) {
             val intent = Intent(context, MainActivity::class.java)

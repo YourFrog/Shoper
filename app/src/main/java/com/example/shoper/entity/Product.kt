@@ -23,6 +23,9 @@ data class Product(
     @ColumnInfo(name="status")
     var status: String = ProductStatus.WAITING.toString(),
 
+    @ColumnInfo(name="ean")
+    var ean: String? = null,
+
     @ColumnInfo(name="id_category")
     var categoryID: Long? = null
 ) : AbstractEntity() {

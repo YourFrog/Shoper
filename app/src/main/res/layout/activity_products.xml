@@ -111,23 +111,49 @@
             </ScrollView>
 
             <!-- Przycisk na dole -->
-            <LinearLayout
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
+                    android:orientation="horizontal"
+                    android:gravity="center"
                     android:layout_gravity="center|bottom">
-
-                    <TextView
+                        <LinearLayout
                             android:id="@+id/new_product_box"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:drawableStart="@drawable/ic_add"
-                            android:layout_gravity="center"/>
+                            android:orientation="vertical"
+                            android:gravity="center">
 
-                    <TextView
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:drawableStart="@drawable/ic_add"
+                                    android:layout_gravity="center"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/add"/>
+                        </LinearLayout>
+                        <LinearLayout
+                            android:id="@+id/scan_product"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/add"/>
-            </LinearLayout>
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:layout_marginStart="10dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:drawableStart="@drawable/ic_add"
+                                    android:layout_gravity="center"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/scanner_ean"/>
+                        </LinearLayout>
+                </LinearLayout>
     </LinearLayout>
 </layout>

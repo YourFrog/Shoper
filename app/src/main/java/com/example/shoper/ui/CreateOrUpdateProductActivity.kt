@@ -9,6 +9,7 @@ import com.example.shoper.R
 import com.example.shoper.databinding.ActivityCreateOrUpdateProductBinding
 import com.example.shoper.entity.Product
 import com.example.shoper.model.Category
+import com.example.shoper.model.EAN
 import com.example.shoper.model.PickerValue
 import com.example.shoper.utils.popup
 import com.google.gson.Gson
@@ -72,6 +73,7 @@ class CreateOrUpdateProductActivity : AppCompatActivity() {
                     name = binding.name.text.toString(),
                     weightType = productWeight!!.toString(),
                     amount = binding.amount.text.toString(),
+                    ean = intent.getStringExtra(INTENT_EAN),
                     categoryID = intent.getLongExtra(INTENT_CATEGORY_ID, 0)
                 )
 
@@ -128,6 +130,7 @@ class CreateOrUpdateProductActivity : AppCompatActivity() {
         const val INTENT_RESULT = "result"
         const val INTENT_PRODUCT = "product"
         const val INTENT_CATEGORY_ID = "id_category"
+        const val INTENT_EAN = "ean"
 
         /* Uruchomienie aktywności dla nowego produktu */
         fun launchForResult(context: Activity, code: Int, category: com.example.shoper.entity.Category) {
@@ -145,6 +148,17 @@ class CreateOrUpdateProductActivity : AppCompatActivity() {
 
             intent.putExtra(INTENT_PRODUCT, gson.toJson(product))
             intent.putExtra(INTENT_CATEGORY_ID, product.categoryID)
+
+            context.startActivityForResult(intent, code)
+        }
+
+        /* Uruchomienie aktywności dla zeskanowanego kodu EAN */
+        fun launchForResult(context: Activity, code: Int, category: com.example.shoper.entity.Category, ean: EAN) {
+            val gson = Gson()
+            val intent = Intent(context, CreateOrUpdateProductActivity::class.java)
+
+            intent.putExtra(INTENT_EAN, ean.value)
+            intent.putExtra(INTENT_CATEGORY_ID, category.id)
 
             context.startActivityForResult(intent, code)
         }
