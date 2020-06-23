@@ -9,37 +9,19 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:drawableStart="@drawable/ic_information_32"
-                android:background="@color/information"
-                android:drawablePadding="10dp"
-                android:text="@string/copy_list_information"/>
-        </androidx.cardview.widget.CardView>
+        <include
+            android:id="@+id/warning_of_copy"
+            layout="@layout/warning_information"
+            app:communicate="@{@string/copy_list_information}"/>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@android:color/darker_gray"/>
+        <include
+            android:id="@+id/warning_separator"
+            layout="@layout/support_separator"/>
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/copy_check_box"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:drawableStart="@drawable/ic_information_32"
-                android:background="@color/information"
-                android:drawablePadding="10dp"
-                android:text="@string/copy_check_element"/>
-        </androidx.cardview.widget.CardView>
+        <include
+                android:id="@+id/warning_of_check"
+                layout="@layout/warning_information"
+                app:communicate="@{@string/copy_check_element}"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/itemsRecycler"

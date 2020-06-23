@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+                name="communicate"
+                type="String" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+            android:id="@+id/warning_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:drawableStart="@drawable/ic_information_32"
+                android:background="@color/information"
+                android:gravity="center_vertical"
+                android:drawablePadding="10dp"
+                android:text="@{communicate}"
+                tools:text="@string/copy_list_information"/>
+    </androidx.cardview.widget.CardView>
+
+</layout>

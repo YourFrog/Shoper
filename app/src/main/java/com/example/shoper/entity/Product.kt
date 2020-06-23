@@ -15,7 +15,7 @@ data class Product(
     var name: String,
 
     @ColumnInfo(name="amount")
-    var amount: String,
+    var amount: Double,
 
     @ColumnInfo(name="weight_type")
     var weightType: String,

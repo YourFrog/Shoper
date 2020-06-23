@@ -28,6 +28,8 @@
     <string name="product_button_save">Zapisz</string>
     <string name="product_button_cancel">Anuluj</string>
 
+    <string name="confirm_remove_product">Czy napewno chcesz usunąć produkt \"%s\" z listy?</string>
+
     <string name="clone_category_name">%s - Kopia</string>
     <string name="remove">Usuń</string>
     <string name="up">W górę</string>
@@ -40,10 +42,10 @@
 
     <string name="picker_select_weight">Wybierz jednostkę miary</string>
 
-    <string name="weight_piece">%s Sztuk</string>
-    <string name="weight_kilo">%s Kilogramów</string>
-    <string name="weight_grams">%s Gramów</string>
-    <string name="weight_litr">%s Litrów</string>
+    <string name="weight_piece">Sztuk</string>
+    <string name="weight_kilo">Kilogramów</string>
+    <string name="weight_grams">Gramów</string>
+    <string name="weight_litr">Litrów</string>
 
     <string name="weight_display_name_piece">Sztuki</string>
     <string name="weight_display_name_kilograms">Kilogramy</string>
@@ -68,6 +70,7 @@
     <string name="product_error_no_product_weight">Wybierz jednostkę miary produktu</string>
     <string name="product_error_no_product_name">Wprowadź nazwę produktu</string>
     <string name="product_error_no_amount">Wprowadź ilość</string>
+    <string name="product_add_fast_comment">Dodaj komentarz</string>
 
     <string name="not_define_any_category">Brak zdefiniowanych list zakupów</string>
 
@@ -89,4 +92,13 @@
 
     <string name="yes">Tak</string>
     <string name="no">Nie</string>
+
+    <string name="accept">Akceptuj</string>
+    <string name="reject">Odrzuć</string>
+    <string name="cancel">Anuluj</string>
+    <string name="save">Zapisz</string>
+    <string name="yes_remove">Tak, usuń</string>
+
+    <string name="warning_of_remove_selected_product">Czy chcesz usunąć zaznaczone produkty</string>
+    <string name="warning_of_fast_change_product_status">"Kliknij, aby dodać komentarz do produktu \"%s\"</string>
 </resources>

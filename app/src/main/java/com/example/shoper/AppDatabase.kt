@@ -14,7 +14,7 @@ import com.example.shoper.repository.ProductDao
 /**
  *  Klasa obsługująca bazę danych
  */
-@Database(entities = [Category::class, Product::class, CatalogProduct::class], version = 1)
+@Database(entities = [Category::class, Product::class, CatalogProduct::class], version = 2)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
 

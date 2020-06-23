@@ -15,7 +15,7 @@ import com.mikepenz.fastadapter.items.AbstractItem
 class CloneProductItem (
     val name: String,
     val amount: Double,
-    val productWeightType: String,
+    val selectValue: Int,
     val values: List<String>,
     val checked: ObservableBoolean,
     val onAmountChange: (CloneProductItem, Int) -> Unit,
@@ -41,7 +41,14 @@ class CloneProductItem (
 
         override fun bindView(item: CloneProductItem, payloads: List<Any>) {
             binding.item = item
-            binding.amountPicker.progress = item.amount.toInt()
+            binding.mainContainer.setOnClickListener {
+                if( item.checked.get() ) {
+                    binding.amountPicker.progress += 1
+                } else {
+                    binding.checkbox.isChecked = !binding.checkbox.isChecked
+                }
+            }
+            binding.amountPicker.progress = item.selectValue
             binding.amountPicker.max = item.values.size - 1
             binding.amountPicker.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(bar: SeekBar?, value: Int, fromUser: Boolean) {

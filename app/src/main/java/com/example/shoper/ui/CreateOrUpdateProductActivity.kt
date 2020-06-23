@@ -43,7 +43,7 @@ class CreateOrUpdateProductActivity : AppCompatActivity() {
             productWeight = Category.Product.Weight.valueOf(it.weightType)
 
             binding.name.setText(it.name)
-            binding.amount.setText(it.amount)
+            binding.amount.setText(it.amount.toString())
             binding.productWeight.setText(getString(productWeight!!.displayName))
         }
 
@@ -67,12 +67,12 @@ class CreateOrUpdateProductActivity : AppCompatActivity() {
                 val intentOfResult = Intent(this, CreateOrUpdateProductActivity::class.java)
                 val product = product?.copy(
                     name = binding.name.text.toString(),
-                    amount = binding.amount.text.toString(),
+                    amount = binding.amount.text.toString().toDouble(),
                     weightType = productWeight!!.toString()
                 ) ?: Product(
                     name = binding.name.text.toString(),
                     weightType = productWeight!!.toString(),
-                    amount = binding.amount.text.toString(),
+                    amount = binding.amount.text.toString().toDouble(),
                     ean = intent.getStringExtra(INTENT_EAN),
                     categoryID = intent.getLongExtra(INTENT_CATEGORY_ID, 0)
                 )

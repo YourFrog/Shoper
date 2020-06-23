@@ -7,5 +7,12 @@
     <color name="colorAccent">#D81B60</color>
 
     <color name="information">#fffcd6</color>
+    <color name="black">#000</color>
     <color name="white">#ffffff</color>
+    <color name="gray">#ebebeb</color>
+    <color name="darkGray">#A9A9A9</color>
+    <color name="minus">#A82616</color>
+    <color name="plus">#75E07C</color>
+    <color name="product_selected">#75E07C</color>
+
 </resources>

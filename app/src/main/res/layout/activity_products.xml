@@ -4,17 +4,89 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/main_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_margin="5dp">
+            android:orientation="vertical">
+
+            <!-- Komunikat dotyczący usuwania produktów -->
+            <LinearLayout
+                    android:id="@+id/warning_or_remove_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:elevation="2dp">
+                    <include
+                            android:id="@+id/warning_separator"
+                            layout="@layout/support_separator"/>
+                    <include
+                            android:id="@+id/warning_of_remove"
+                            layout="@layout/warning_question"/>
+            </LinearLayout>
+
+            <!-- Komunikat dotyczący zmianę statusu produktu -->
+            <LinearLayout
+                    android:id="@+id/warning_of_fast_comment_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:elevation="2dp">
+                    <include
+                            android:id="@+id/warning_separator2"
+                            layout="@layout/support_separator"/>
+                    <include
+                            android:id="@+id/warning_of_fast_comment"
+                            layout="@layout/warning_information"/>
+            </LinearLayout>
+
+            <LinearLayout
+                    android:id="@+id/view_pager_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <androidx.viewpager2.widget.ViewPager2
+                            android:id="@+id/photos_viewpager"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:layout_margin="5dp"/>
+
+                    <com.google.android.material.tabs.TabLayout
+                            android:id="@+id/tab_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            app:tabBackground="@drawable/tab_selector"
+                            app:tabGravity="center"
+                            app:tabIndicatorHeight="0dp"
+                            android:elevation="5dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                    android:id="@+id/products_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
             <!-- Listy -->
             <ScrollView
+                    android:id="@+id/scroll_view"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    android:layout_margin="5dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
+
                     <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
@@ -112,6 +184,7 @@
 
             <!-- Przycisk na dole -->
                 <LinearLayout
+                    android:id="@+id/buttons_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -155,5 +228,7 @@
                                     android:text="@string/scanner_ean"/>
                         </LinearLayout>
                 </LinearLayout>
-    </LinearLayout>
+
+            </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

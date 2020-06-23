@@ -14,7 +14,10 @@ import com.example.shoper.entity.Product
 import com.example.shoper.model.Category.Product.Weight
 import com.example.shoper.model.ShopList
 import com.example.shoper.ui.item.CloneProductItem
+import com.example.shoper.utils.factor
+import com.example.shoper.utils.formatAmount
 import com.example.shoper.utils.popup
+import com.example.shoper.utils.round
 import com.google.gson.Gson
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.adapters.ItemAdapter
@@ -82,35 +85,36 @@ class CloneShopListActivity : AppCompatActivity() {
             val weightType = Weight.valueOf(product.weightType)
             val selectProduct = selectedProducts.firstOrNull { it.index == productIndex }
 
+            var selectValue = 0
+            var isChecked = ObservableBoolean(false)
+
+            selectProduct?.let {
+                selectValue = it.selectedProgressValue
+                isChecked.set(true)
+            }
+
             CloneProductItem(
                 name = product.name,
-                amount = (selectProduct?.selectedProgressValue ?: product.amount.toInt()).toDouble(),
-                productWeightType = getString(weightType.displayName),
-                checked = ObservableBoolean(selectProduct?.let {true} ?: false),
-                values = getPossibleValues(product).map {
-                    val value = if( floor(it) == ceil(it) ) {
-                        it.toInt()
-                    } else {
-                        it
-                    }
-
-                    value.toString() + " " + getString(weightType.displayShort)
+                amount = selectValue.toDouble(),
+                selectValue = selectValue,
+                checked = isChecked,
+                values = getPossibleValues(product).map { mapValue ->
+                    product.formatAmount(mapValue) + " " + getString(weightType.displayShort)
                 },
                 onAmountChange = { _, selectedValue ->
                     selectedProducts.first { it.index == productIndex }.selectedProgressValue = selectedValue
                 },
                 onChecked = {
-                    val i = 0
-                    binding.copyCheckBox.visibility = View.GONE
+                    binding.warningOfCopy.warningContainer.visibility = View.GONE
                     selectedProducts.add(
                         SelectProduct(
                         productIndex,
-                        99
+                        0
                     ))
                 },
                 onUnchecked = {
                     val anyoneChecked = adapter.itemList.items.map{ it.checked.get() }.firstOrNull { it } ?: false
-                    binding.copyCheckBox.visibility = if( anyoneChecked ) {
+                    binding.warningOfCopy.warningContainer.visibility = if( anyoneChecked ) {
                         View.GONE
                     } else {
                         View.VISIBLE
@@ -135,9 +139,10 @@ class CloneShopListActivity : AppCompatActivity() {
                     val gson = Gson()
                     putExtra(RESULT_PRODUCTS, gson.toJson(selectedProducts.map {
                         val product = products[it.index]
+                        val possibleValues = getPossibleValues(product)
 
                         product.copy(
-                            amount = it.selectedProgressValue.toString()
+                            amount = possibleValues.getOrNull(it.selectedProgressValue) ?: product.amount
                         )
                     }))
                     putExtra(RESULT_CATEGORY, gson.toJson(category))
@@ -152,29 +157,27 @@ class CloneShopListActivity : AppCompatActivity() {
 
     fun getPossibleValues(product: Product): List<Double> {
         val weightType = Weight.valueOf(product.weightType)
-        var factory = 0.toDouble()
+        val factory = product.factor()
 
-        return when(weightType) {
+        val resultList = when(weightType) {
             Weight.LITR,
             Weight.PIECES -> {
-                factory = 1.toDouble()
-                IntArray(21)
+                IntArray(51)
             }
             Weight.GRAMS -> {
-                factory = 100.toDouble()
-                IntArray(21)
+                IntArray(101)
             }
             else -> {
-                factory = 0.5
-                IntArray(21)
+                IntArray(101)
             }
         }
-        .filter {
-            it > 0
-        }
-        .map {
-            it * factory
-        }
+        .mapIndexed { index, item ->
+            index * factory
+        }.toMutableList()
+
+        resultList.set(0, product.amount)
+
+        return resultList
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

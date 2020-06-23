@@ -2,6 +2,8 @@ package com.example.shoper.utils
 
 import android.app.Activity
 import android.content.Context
+import android.text.InputType
+import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import com.example.shoper.R
 
@@ -40,6 +42,22 @@ class Popup(val context: Context) {
         builder.setPositiveButton(yes) { _, _ -> onYes() }
         builder.setNegativeButton(no) { _, _ -> onNo() }
         builder.create().show()
+    }
+
+    fun showInput(message: Int) {
+        val input = EditText(context).apply {
+            inputType = InputType.TYPE_CLASS_TEXT
+        }
+
+        AlertDialog.Builder(context).apply {
+            setTitle(context.getString(message))
+            setView(input)
+            setPositiveButton(R.string.save, { _, _ -> {}})
+            setNegativeButton(R.string.cancel, { _, _ -> {}})
+
+            create().show()
+        }
+
     }
 }
 

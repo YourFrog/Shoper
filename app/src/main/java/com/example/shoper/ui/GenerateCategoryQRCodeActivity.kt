@@ -24,6 +24,9 @@ class GenerateCategoryQRCodeActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_generate_category_q_r_code)
 
 
@@ -50,6 +53,11 @@ class GenerateCategoryQRCodeActivity : BaseActivity() {
             title = getString(R.string.qrcode_generate_title, shopList.category.name)
             binding.qrImage.setImageBitmap(encoder.encodeAsBitmap())
         }.addTo(disposable)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 
     companion object {
