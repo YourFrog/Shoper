@@ -38,7 +38,7 @@
     <string name="clone">Sklonuj</string>
     <string name="down">W dół</string>
     <string name="unselect">Odznacz</string>
-    <string name="category_elements">Elementów %d</string>
+    <string name="category_elements">Do kupienia: %d, Kupionych: %d, Wszystkich: %d</string>
 
     <string name="picker_select_weight">Wybierz jednostkę miary</string>
 
@@ -65,7 +65,6 @@
     <string name="product_status_waiting">Produkty do zakupienia</string>
     <string name="product_status_complete">Produkty zakupione</string>
     <string name="product_status_not_found">Brak produktów</string>
-    <string name="product_status_part">Częściowo kupione</string>
 
     <string name="product_error_no_product_weight">Wybierz jednostkę miary produktu</string>
     <string name="product_error_no_product_name">Wprowadź nazwę produktu</string>

@@ -7,15 +7,10 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableInt
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
 import com.example.shoper.AppDatabase
 import com.example.shoper.R
 import com.example.shoper.databinding.ActivityProductsBinding
@@ -35,39 +30,176 @@ import com.example.shoper.utils.slideUp
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.zxing.integration.android.IntentIntegrator
 import com.mikepenz.fastadapter.FastAdapter
-import com.mikepenz.fastadapter.ISelectionListener
 import com.mikepenz.fastadapter.adapters.ItemAdapter
-import com.mikepenz.fastadapter.dsl.itemAdapter
+import com.mikepenz.fastadapter.select.SelectExtension
 import com.mikepenz.fastadapter.select.getSelectExtension
-import com.mikepenz.itemanimators.SlideDownAlphaAnimator
+import com.mikepenz.fastadapter.select.selectExtension
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import org.koin.android.ext.android.bind
+import java.util.*
 import java.util.concurrent.TimeUnit
+
+
+interface ProductMapper {
+    fun productToItem(product: Product, adapter: ItemAdapter<ProductItem>? = null): ProductItem
+}
 
 /**
  *  Lista produktów wchodzących w skład kategorii
  */
-class ProductsActivity : BaseActivity() {
+class ProductsActivity : BaseActivity(), ProductMapper {
 
     private lateinit var binding: ActivityProductsBinding
 
     private lateinit var shopList: ShopList
 
-    private lateinit var productBoughtAdapter: ItemAdapter<ProductItem>
-
-    private lateinit var productWaitingAdapter: ItemAdapter<ProductItem>
-
-    private lateinit var productNoFoundAdapter: ItemAdapter<ProductItem>
-
-    private lateinit var productPartAdapter: ItemAdapter<ProductItem>
-
     private val disposableOfShowingChangeProductStatus by lazy {
         CompositeDisposable().apply {
             addTo(disposable)
+        }
+    }
+
+    class Adapter(
+        private val context: Context,
+        private val mapper: ProductMapper,
+        val onProductSwipe: (ProductItem, ProductStatus, ItemAdapter<ProductItem>) -> Unit,
+        val onProductSelectionChange: (SelectExtension<ProductItem>, ProductItem, Boolean) -> Unit
+    ) : FastAdapter<CategoryProductsItem>() {
+
+        val map: EnumMap<ProductStatus, CategoryProductsItem> = EnumMap(ProductStatus::class.java)
+
+        val adapter: ItemAdapter<CategoryProductsItem> by lazy {
+            ItemAdapter<CategoryProductsItem>().apply {
+                this@Adapter.map.forEach {
+                    add(it.value)
+                }
+            }
+        }
+
+        init {
+            val values = ProductStatus.values()
+
+            values.sortBy { it.ordinal }
+            values.map { status ->
+                val productAdapter = ItemAdapter<ProductItem>()
+
+                map[status] = CategoryProductsItem(
+                    title = context.getString(when(status) {
+                        ProductStatus.BOUGHT -> R.string.product_status_complete
+                        ProductStatus.WAITING -> R.string.product_status_waiting
+                        ProductStatus.NO_FOUND -> R.string.product_status_not_found
+                    }),
+                    productsAdapter = productAdapter,
+                    onProductSwipe = { item, newStatus ->
+                        onProductSwipe(item, newStatus, productAdapter)
+                    },
+                    onProductSelectionChange = onProductSelectionChange
+                )
+            }
+
+            addAdapter(0, adapter)
+        }
+
+        fun notifyProductChangeStatus(item: ProductItem) {
+            removeProduct(item)
+            addProduct(item.product)
+        }
+
+        fun removeSelectedProducts() {
+            var refreshAdapter = false
+
+            map.forEach {
+                it.value.productsAdapter.let { productsAdapter ->
+                    productsAdapter.fastAdapter?.getSelectExtension()?.deleteAllSelectedItems()
+
+                    if( productsAdapter.itemList.isEmpty ) {
+                        refreshAdapter = true
+                    }
+                }
+            }
+
+            if( refreshAdapter ) {
+                adapter.fastAdapter?.notifyAdapterDataSetChanged()
+            }
+        }
+
+        fun removeProduct(item: ProductItem) {
+            map.filter { it.value.productsAdapter.itemList.items.contains(item) }.map {
+                it.value.productsAdapter.removeByIdentifier(item.identifier)
+                it.value.productsAdapter.fastAdapter?.notifyAdapterDataSetChanged()
+
+                if( it.value.productsAdapter.itemList.isEmpty ) {
+                    adapter.fastAdapter?.notifyAdapterDataSetChanged()
+                }
+            }
+        }
+
+        fun addProduct(product: Product) {
+            val status = ProductStatus.valueOf(product.status)
+
+            map[status]?.productsAdapter?.let { adapter ->
+                val item = mapper.productToItem(product, adapter)
+                adapter.add(item)
+                adapter.fastAdapter?.notifyAdapterDataSetChanged()
+            }
+        }
+
+        fun unSelect() {
+            getSelectExtension().deselect()
+        }
+
+        fun selected(): List<ProductItem> {
+            val result = ArrayList<ProductItem>()
+
+            adapter.itemList.items.map {
+                result.addAll(
+                    it.productsAdapter.fastAdapter?.getSelectExtension()?.selectedItems ?: emptyList()
+                )
+            }
+
+            return result
+        }
+    }
+
+    private val adapter: Adapter by lazy {
+        Adapter(
+            context = this,
+            mapper = this,
+            onProductSwipe = { productItem, newStatus, itemAdapter ->
+                itemAdapter.fastAdapter?.getSelectExtension()?.deselect()
+                changeProductStatus(productItem, newStatus)
+
+                binding.warningOfFastComment.communicate = getString(R.string.warning_of_fast_change_product_status, productItem.product.name)
+                showWarningOrFastCommentContainer()
+
+                this@ProductsActivity.disposableOfShowingChangeProductStatus.clear()
+                Single
+                    .just(1)
+                    .delay(5, TimeUnit.SECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        hideWarningOfFastComment()
+                    },
+                        ::handleError
+                    ).addTo(this@ProductsActivity.disposableOfShowingChangeProductStatus)
+            },
+            onProductSelectionChange = { selectExtension, _, _ ->
+                if( selectExtension.selectedItems.isEmpty() ) {
+                    hideWarningOfRemove()
+                } else {
+                    showWarningOrRemove()
+                }
+            }
+        ).apply {
+            shopList.products.forEach { product ->
+                addProduct(product)
+            }
         }
     }
 
@@ -104,16 +236,26 @@ class ProductsActivity : BaseActivity() {
         }
 
         binding.warningOfRemove.accept.setOnClickListener {
-            productWaitingAdapter.fastAdapter?.getSelectExtension()?.deleteAllSelectedItems()
+            removeSelectedProducts()
             hideWarningOfRemove()
         }
 
         binding.warningOfRemove.reject.setOnClickListener {
-            productWaitingAdapter.fastAdapter?.getSelectExtension()?.deselect()
+            adapter.unSelect()
             hideWarningOfRemove()
         }
 
         setupView()
+    }
+
+    fun removeSelectedProducts() {
+        val products = adapter.selected().map { it.product }
+
+        AppDatabase.getInstance(applicationContext).productDao().remove(products)
+            .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
+                    adapter.removeSelectedProducts()
+                }, ::handleError
+            ).addTo(disposable)
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -222,85 +364,18 @@ class ProductsActivity : BaseActivity() {
 
                 title = shopList.category.name
 
-                productBoughtAdapter = prepareAdapter(Category.Product.Status.BOUGHT)
-                productWaitingAdapter = prepareAdapter(Category.Product.Status.WAITING)
-                productNoFoundAdapter = prepareAdapter(Category.Product.Status.NO_FOUND)
-                productPartAdapter = prepareAdapter(Category.Product.Status.PART)
-
-
                 refreshView()
             }, ::handleError
         ).addTo(disposable)
     }
 
     private fun refreshView() {
-        binding.productsWaiting.itemAnimator = SlideDownAlphaAnimator()
-        binding.productsWaiting.adapter = FastAdapter.with(productWaitingAdapter).apply {
-            val adapter = this
-
-        }
-        binding.productsComplete.adapter = FastAdapter.with(productBoughtAdapter)
-        binding.productsNotFound.adapter = FastAdapter.with(productNoFoundAdapter)
-        binding.productsPart.adapter = FastAdapter.with(productPartAdapter)
-
-        binding.photosViewpager.adapter = FastAdapter.with(ItemAdapter<CategoryProductsItem>().apply {
-
-            ProductStatus.values().map {  currentProductStatus ->
-                val currentProducts = shopList.products.filter { product -> ProductStatus.valueOf(product.status) == currentProductStatus }
-
-                add(createCategoryProductsItem(
-                    title = getString(when(currentProductStatus) {
-                        ProductStatus.BOUGHT -> R.string.product_status_complete
-                        ProductStatus.PART -> R.string.product_status_part
-                        ProductStatus.WAITING -> R.string.product_status_waiting
-                        ProductStatus.NO_FOUND -> R.string.product_status_not_found
-                    }),
-                    products = currentProducts
-                ))
-            }
-        })
+        binding.photosViewpager.adapter = adapter
         TabLayoutMediator(binding.tabLayout, binding.photosViewpager) { tab, position ->
 
         }.attach()
-    }
 
-    private fun createCategoryProductsItem(title: String, products: List<Product>): CategoryProductsItem {
-        val itemAdapter = ItemAdapter<ProductItem>()
-
-        return CategoryProductsItem(
-            title = title,
-            productsAdapter = itemAdapter.apply {
-                products.forEach {
-                    add(createProductItem(it, this))
-                }
-            },
-            onProductSwipe = { productItem, newStatus ->
-                itemAdapter.fastAdapter?.getSelectExtension()?.deselect()
-                changeProductStatus(productItem, newStatus)
-
-                binding.warningOfFastComment.communicate = getString(R.string.warning_of_fast_change_product_status, productItem.product.name)
-                showWarningOrFastCommentContainer()
-
-                this@ProductsActivity.disposableOfShowingChangeProductStatus.clear()
-                Single
-                    .just(1)
-                    .delay(5, TimeUnit.SECONDS)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        hideWarningOfFastComment()
-                    },
-                        ::handleError
-                    ).addTo(this@ProductsActivity.disposableOfShowingChangeProductStatus)
-            },
-            onProductSelectionChange = { selectExtension, _, _ ->
-                if( selectExtension.selectedItems.isEmpty() ) {
-                    hideWarningOfRemove()
-                } else {
-                    showWarningOrRemove()
-                }
-            }
-        )
+        binding.tabLayout.getTabAt(1)?.select()
     }
 
     private fun showWarningOrRemove() {
@@ -314,11 +389,6 @@ class ProductsActivity : BaseActivity() {
      */
     private fun hideWarningOfRemove() {
         binding.warningOrRemoveContainer.slideDown()
-
-        productWaitingAdapter.itemList.items.forEach {
-            it.backgroundColor.set(R.color.transparent)
-            it.menuVisisble.set(View.VISIBLE)
-        }
     }
 
     private fun showWarningOrFastCommentContainer() {
@@ -329,17 +399,6 @@ class ProductsActivity : BaseActivity() {
 
     private fun hideWarningOfFastComment() {
         binding.warningOfFastCommentContainer.slideDown()
-    }
-    private fun prepareAdapter(status: Category.Product.Status): ItemAdapter<ProductItem> {
-        val adapter = ItemAdapter<ProductItem>()
-
-        shopList.products.filter { it.status == status.toString() }.sortedBy { it.name }.forEach { product ->
-            val item = createProductItem(product, null)
-
-            adapter.add(item)
-        }
-
-        return adapter
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -368,7 +427,7 @@ class ProductsActivity : BaseActivity() {
     /**
      *  Utworzenie itemka reprezentującego produkt
      */
-    private fun createProductItem(product: Product, adapter: ItemAdapter<ProductItem>? = null): ProductItem {
+    override fun productToItem(product: Product, adapter: ItemAdapter<ProductItem>?): ProductItem {
         return ProductItem(
             product = product,
             backgroundColor = ObservableInt(R.color.transparent),
@@ -379,9 +438,6 @@ class ProductsActivity : BaseActivity() {
             },
             onNotFoundClick = { item ->
                 changeProductStatus(item, ProductStatus.NO_FOUND)
-            },
-            onPartClick = { item ->
-                changeProductStatus(item, ProductStatus.PART)
             },
             onWaitingClick = { item ->
                 changeProductStatus(item, ProductStatus.WAITING)
@@ -406,58 +462,47 @@ class ProductsActivity : BaseActivity() {
                     adapter?.fastAdapter?.notifyAdapterDataSetChanged()
                 }, ::handleError).addTo(disposable)
             },
-            onRemoveClick = ::removeProduct
+            onRemoveClick = ::questionOfRemoveProduct
         )
     }
 
-    private fun removeProduct(item: ProductItem) {
+    /**
+     *  Zadaje pytanie czy usunąć produkt
+     */
+    private fun questionOfRemoveProduct(item: ProductItem) {
         val product = item.product
 
         popup().showMessageYesOrNo(getString(R.string.confirm_remove_product, product.name), onYes = {
-            AppDatabase.getInstance(applicationContext).productDao().remove(product)
-                .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
+            removeProduct(item)
+        })
+    }
+
+    /**
+     *  Usuwa produkt
+     */
+    private fun removeProduct(item: ProductItem) {
+        val product = item.product
+
+        AppDatabase.getInstance(applicationContext).productDao().remove(product)
+            .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
                 {
-                    currentAdapterForProduct(item.product).apply {
-                        removeByIdentifier(item.identifier)
-                    }
+                    adapter.removeProduct(item)
                 }, ::handleError
             ).addTo(disposable)
-        })
     }
 
     /**
      *  Zmienia status produktowi oraz przesuwa go pomiędzy adapterami aby trafił na prawidłową liste
      */
-    fun changeProductStatus(item: ProductItem, newStatus: ProductStatus) {
+    private fun changeProductStatus(item: ProductItem, newStatus: ProductStatus) {
         val product = item.product
-
-        currentAdapterForProduct(product).apply {
-            removeByIdentifier(item.identifier)
-
-        }
 
         product.status = newStatus.toString()
 
         AppDatabase.getInstance(applicationContext).productDao().update(product).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
-                currentAdapterForProduct(product).apply {
-                    add(createProductItem(product, null))
-                }
+                adapter.notifyProductChangeStatus(item)
             }, ::handleError
         ).addTo(disposable)
-    }
-
-    /**
-     *  Zwraca adapter pasujący do aktualnego statusu produktu
-     */
-    private fun currentAdapterForProduct(product: Product): ItemAdapter<ProductItem> {
-        val currentStatus = ProductStatus.valueOf(product.status)
-
-        return when(currentStatus) {
-            ProductStatus.WAITING -> productWaitingAdapter
-            ProductStatus.BOUGHT -> productBoughtAdapter
-            ProductStatus.NO_FOUND -> productNoFoundAdapter
-            ProductStatus.PART -> productPartAdapter
-        }
     }
 
     companion object {

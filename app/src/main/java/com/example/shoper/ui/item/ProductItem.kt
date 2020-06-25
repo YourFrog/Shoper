@@ -30,7 +30,6 @@ class ProductItem (
     val onMinusClick: (ProductItem) -> Unit,
     val onBoughtClick: (ProductItem) -> Unit,
     val onWaitingClick: (ProductItem) -> Unit,
-    val onPartClick: (ProductItem) -> Unit,
     val onNotFoundClick: (ProductItem) -> Unit,
     val onEditClick: (ProductItem) -> Unit,
     val onRemoveClick: (ProductItem) -> Unit,
@@ -123,7 +122,6 @@ class ProductItem (
                         R.id.remove -> item.onRemoveClick(item)
                         R.id.bought -> item.onBoughtClick(item)
                         R.id.waiting -> item.onWaitingClick(item)
-                        R.id.part -> item.onPartClick(item)
                         R.id.no_found -> item.onNotFoundClick(item)
                         R.id.edit -> item.onEditClick(item)
                     }
@@ -131,9 +129,6 @@ class ProductItem (
                 }
 
                 when(currentStatus) {
-                    ProductStatus.PART -> {
-                        popup.menu.removeItem(R.id.part)
-                    }
                     ProductStatus.BOUGHT -> {
                         popup.menu.removeItem(R.id.bought)
                     }

@@ -27,6 +27,9 @@ interface AbstractDao<T: AbstractEntity>
 
     @Delete
     fun remove(item: T): Single<Int>
+
+    @Delete
+    fun remove(item: List<T>): Single<Int>
 }
 
 /**

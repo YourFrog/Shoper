@@ -1,9 +1,8 @@
 package com.example.shoper.model
 
 
-enum class ProductStatus(val value: Int) {
-    BOUGHT(0),
-    PART(1),
-    WAITING(2),
-    NO_FOUND(3)
+enum class ProductStatus(val value: Int, order: Int) {
+    BOUGHT(0, 10),
+    WAITING(2, 0),
+    NO_FOUND(3, 20)
 }

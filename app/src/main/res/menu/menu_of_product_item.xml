@@ -13,11 +13,6 @@
                 android:title="@string/product_menu_waiting"
                 app:showAsAction="never" />
         <item
-                android:id="@+id/part"
-                android:orderInCategory="200"
-                android:title="@string/product_menu_part"
-                app:showAsAction="never" />
-        <item
                 android:id="@+id/no_found"
                 android:orderInCategory="200"
                 android:title="@string/product_menu_no_found"

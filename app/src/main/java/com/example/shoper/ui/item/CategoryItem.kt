@@ -4,6 +4,7 @@ import android.view.View
 import android.widget.PopupMenu
 import com.example.shoper.R
 import com.example.shoper.databinding.ItemCategoryBinding
+import com.example.shoper.model.ProductStatus
 import com.example.shoper.model.ShopList
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
@@ -38,12 +39,22 @@ class CategoryItem (
         override fun bindView(item: CategoryItem, payloads: List<Any>) {
             val binding = ItemCategoryBinding.bind(itemView)
 
-            binding.category.setOnClickListener {
+            binding.mainContainer.setOnClickListener {
                 item.onClick(item)
             }
             binding.name.text = item.shopList.category.name
-            binding.description.text = item.shopList.category.description
-            binding.amountOfElements.text = itemView.context.getString(R.string.category_elements, item.shopList.products.size)
+
+            item.shopList.products.let { products ->
+                binding.percentOfComplete.text = (products.filter { it.status == ProductStatus.BOUGHT.toString() }.size / products.size.toDouble() * 100).toInt().toString() + "%"
+                binding.amountOfElements.text =
+                    itemView.context.getString(
+                        R.string.category_elements,
+                        products.filter { it.status == ProductStatus.WAITING.toString() }.size,
+                        products.filter { it.status == ProductStatus.BOUGHT.toString() }.size,
+                        products.size
+                    )
+            }
+
             binding.menu.setOnClickListener {
                 val popup = PopupMenu(itemView.context, it)
 

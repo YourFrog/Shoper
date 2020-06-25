@@ -22,8 +22,8 @@ import java.util.concurrent.TimeUnit
 class CategoryProductsItem (
     val title: String,
     val productsAdapter: ItemAdapter<ProductItem>,
-    val onProductSwipe: (ProductItem, ProductStatus) -> Unit,
-    val onProductSelectionChange: (SelectExtension<ProductItem>, ProductItem, Boolean) -> Unit
+    val onProductSwipe: (ProductItem, ProductStatus) -> Unit = { _, _ -> },
+    val onProductSelectionChange: (SelectExtension<ProductItem>, ProductItem, Boolean) -> Unit = { _, _, _ -> }
 ) : AbstractItem<CategoryProductsItem.ViewHolder>() {
 
     /** defines the type defining this item. must be unique. preferably an id */
@@ -44,7 +44,34 @@ class CategoryProductsItem (
             ItemCategoryProductsBinding.bind(itemView)
         }
 
+        override fun attachToWindow(item: CategoryProductsItem) {
+            super.attachToWindow(item)
+
+            if( item.productsAdapter.itemList.isEmpty ) {
+                binding.noProducts.visibility = View.VISIBLE
+                binding.productsRecycler.visibility = View.GONE
+            } else {
+                binding.noProducts.visibility = View.GONE
+                binding.productsRecycler.visibility = View.VISIBLE
+            }
+        }
+
         override fun bindView(item: CategoryProductsItem, payloads: List<Any>) {
+
+            if( item.productsAdapter.itemList.isEmpty ) {
+                binding.noProducts.visibility = View.VISIBLE
+                binding.productsRecycler.visibility = View.GONE
+            } else {
+                binding.noProducts.visibility = View.GONE
+                binding.productsRecycler.visibility = View.VISIBLE
+            }
+
+            binding.item = item
+
+            setupView(item)
+        }
+
+        private fun setupView(item: CategoryProductsItem) {
             binding.productsRecycler.adapter = FastAdapter.with(item.productsAdapter).apply {
 
                 val extension = this.getSelectExtension()
@@ -73,8 +100,6 @@ class CategoryProductsItem (
             }
 
             attachSwipe(item)
-
-            binding.item = item
         }
 
         override fun unbindView(item: CategoryProductsItem) { }
@@ -93,16 +118,16 @@ class CategoryProductsItem (
                             when {
                                 direction.and(ItemTouchHelper.END) == 0 -> when(currentStatus) {
                                     // W lewo
-                                    ProductStatus.WAITING -> ProductStatus.NO_FOUND
+                                    ProductStatus.WAITING -> ProductStatus.BOUGHT
                                     ProductStatus.BOUGHT -> ProductStatus.NO_FOUND
-                                    ProductStatus.NO_FOUND -> ProductStatus.BOUGHT
+                                    ProductStatus.NO_FOUND -> ProductStatus.WAITING
                                     else -> null
                                 }
                                 direction.and(ItemTouchHelper.START) == 0 -> when(currentStatus) {
                                     // W prawo
-                                    ProductStatus.WAITING -> ProductStatus.BOUGHT
+                                    ProductStatus.WAITING -> ProductStatus.NO_FOUND
                                     ProductStatus.BOUGHT -> ProductStatus.WAITING
-                                    ProductStatus.NO_FOUND -> ProductStatus.WAITING
+                                    ProductStatus.NO_FOUND -> ProductStatus.BOUGHT
                                     else -> null
                                 }
                                 else -> null
