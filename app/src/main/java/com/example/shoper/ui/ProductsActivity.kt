@@ -166,42 +166,7 @@ class ProductsActivity : BaseActivity(), ProductMapper {
         }
     }
 
-    private val adapter: Adapter by lazy {
-        Adapter(
-            context = this,
-            mapper = this,
-            onProductSwipe = { productItem, newStatus, itemAdapter ->
-                itemAdapter.fastAdapter?.getSelectExtension()?.deselect()
-                changeProductStatus(productItem, newStatus)
-
-                binding.warningOfFastComment.communicate = getString(R.string.warning_of_fast_change_product_status, productItem.product.name)
-                showWarningOrFastCommentContainer()
-
-                this@ProductsActivity.disposableOfShowingChangeProductStatus.clear()
-                Single
-                    .just(1)
-                    .delay(5, TimeUnit.SECONDS)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        hideWarningOfFastComment()
-                    },
-                        ::handleError
-                    ).addTo(this@ProductsActivity.disposableOfShowingChangeProductStatus)
-            },
-            onProductSelectionChange = { selectExtension, _, _ ->
-                if( selectExtension.selectedItems.isEmpty() ) {
-                    hideWarningOfRemove()
-                } else {
-                    showWarningOrRemove()
-                }
-            }
-        ).apply {
-            shopList.products.forEach { product ->
-                addProduct(product)
-            }
-        }
-    }
+    private lateinit var adapter: Adapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -287,7 +252,7 @@ class ProductsActivity : BaseActivity(), ProductMapper {
                                     it.copy(
                                         name = product.name,
                                         weightType = product.weightType
-                                    )).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({}, ::handleError)
+                                    )).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ }, ::handleError)
                             },
                             onComplete = {
                                 AppDatabase.getInstance(applicationContext).catalogProductDao().insert(
@@ -295,7 +260,7 @@ class ProductsActivity : BaseActivity(), ProductMapper {
                                     name = product.name,
                                     ean = it,
                                     weightType = product.weightType
-                                )).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({}, ::handleError)
+                                )).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({ }, ::handleError)
                             },
                             onError = ::handleError
                         )
@@ -370,11 +335,44 @@ class ProductsActivity : BaseActivity(), ProductMapper {
     }
 
     private fun refreshView() {
+        adapter = Adapter(
+            context = this,
+            mapper = this,
+            onProductSwipe = { productItem, newStatus, itemAdapter ->
+                itemAdapter.fastAdapter?.getSelectExtension()?.deselect()
+                changeProductStatus(productItem, newStatus)
+
+                binding.warningOfFastComment.communicate = getString(R.string.warning_of_fast_change_product_status, productItem.product.name)
+                showWarningOrFastCommentContainer()
+
+                this@ProductsActivity.disposableOfShowingChangeProductStatus.clear()
+                Single
+                    .just(1)
+                    .delay(5, TimeUnit.SECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        hideWarningOfFastComment()
+                    },
+                        ::handleError
+                    ).addTo(this@ProductsActivity.disposableOfShowingChangeProductStatus)
+            },
+            onProductSelectionChange = { selectExtension, _, _ ->
+                if( selectExtension.selectedItems.isEmpty() ) {
+                    hideWarningOfRemove()
+                } else {
+                    showWarningOrRemove()
+                }
+            }
+        ).apply {
+            shopList.products.forEach { product ->
+                addProduct(product)
+            }
+        }
+
         binding.photosViewpager.adapter = adapter
-        TabLayoutMediator(binding.tabLayout, binding.photosViewpager) { tab, position ->
 
-        }.attach()
-
+        TabLayoutMediator(binding.tabLayout, binding.photosViewpager) { tab, position -> }.attach()
         binding.tabLayout.getTabAt(1)?.select()
     }
 

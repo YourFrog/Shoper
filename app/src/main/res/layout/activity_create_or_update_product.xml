@@ -63,19 +63,41 @@
                             android:text="@string/product_title_amount"
                             android:padding="5dp" />
 
-                    <EditText
-                            android:id="@+id/amount"
+                    <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:autofillHints="aaa"
-                            android:gravity="start"
-                            android:lines="1"
-                            android:maxLines="1"
-                            android:singleLine="true"
-                            android:padding="5dp"
-                            android:hint="Wprowadź wartość"
-                            android:inputType="numberDecimal"
-                            android:background="@null"/>
+                            android:orientation="horizontal"
+                            android:gravity="center">
+
+                        <TextView
+                                android:id="@+id/minus"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:drawableStart="@drawable/ic_minus_36"
+                                app:drawableTint="@color/minus"
+                                android:layout_marginEnd="20dp"/>
+
+                        <EditText
+                                android:id="@+id/amount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:autofillHints="aaa"
+                                android:gravity="center"
+                                android:lines="1"
+                                android:maxLines="1"
+                                android:singleLine="true"
+                                android:padding="5dp"
+                                android:hint="Wprowadź wartość"
+                                android:inputType="numberDecimal"
+                                android:background="@null"/>
+
+                        <TextView
+                                android:id="@+id/plus"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:drawableStart="@drawable/ic_plus_36"
+                                app:drawableTint="@color/plus"/>
+                    </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

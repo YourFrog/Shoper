@@ -2,8 +2,10 @@ package com.example.shoper.ui
 
 import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.example.shoper.R
 import com.example.shoper.databinding.ActivityCreateOrUpdateProductBinding
@@ -11,8 +13,12 @@ import com.example.shoper.entity.Product
 import com.example.shoper.model.Category
 import com.example.shoper.model.EAN
 import com.example.shoper.model.PickerValue
+import com.example.shoper.utils.factor
+import com.example.shoper.utils.format
 import com.example.shoper.utils.popup
+import com.example.shoper.utils.round
 import com.google.gson.Gson
+
 
 /**
  *  Tworzenie bądź edycja produktu
@@ -24,7 +30,7 @@ class CreateOrUpdateProductActivity : AppCompatActivity() {
     /**
      *  Wybrana przez użytkownika jednostka miary produktu
      */
-    private var productWeight: Category.Product.Weight? = null
+    private lateinit var productWeight: Category.Product.Weight
 
     /* Produkt przekazany do aktywności w celu edycji. W przypadku null'a tworzymy nowy produkt */
     private val product: Product? by lazy {
@@ -38,6 +44,9 @@ class CreateOrUpdateProductActivity : AppCompatActivity() {
 
         title = getString(R.string.product_title_create)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_create_or_update_product)
+
+        setDefaultValue()
+
         product?.let {
             title = getString(R.string.product_title_edit)
             productWeight = Category.Product.Weight.valueOf(it.weightType)
@@ -55,10 +64,28 @@ class CreateOrUpdateProductActivity : AppCompatActivity() {
                 )
             })
         }
+
         binding.buttonCancel.setOnClickListener {
             setResult(Activity.RESULT_CANCELED)
             finish()
         }
+
+        binding.minus.setOnClickListener {
+            val currAmount = binding.amount.text.toString().toDouble()
+
+            if( currAmount > 0 ) {
+                val newAmount = currAmount - productWeight.factor()
+                binding.amount.setText(productWeight.format(newAmount))
+            }
+        }
+
+        binding.plus.setOnClickListener {
+            val currAmount = binding.amount.text.toString().toDouble()
+            val newAmount = currAmount + productWeight.factor()
+
+            binding.amount.setText(productWeight.format(newAmount))
+        }
+
         binding.buttonSave.setOnClickListener {
             val hasError = checkErrors()
 
@@ -81,6 +108,23 @@ class CreateOrUpdateProductActivity : AppCompatActivity() {
                 setResult(Activity.RESULT_OK, intentOfResult)
                 finish()
             }
+        }
+
+        binding.name.requestFocus()
+        val imm: InputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(binding.name, InputMethodManager.SHOW_IMPLICIT)
+    }
+
+    /**
+     *  Ustawienie domyślnej wartości na polach
+     */
+    private fun setDefaultValue() {
+        binding.amount.setText("1")
+        Category.Product.Weight.values().first {
+            it.default
+        }.let {
+            productWeight = it
+            binding.productWeight.setText(it.displayName)
         }
     }
 
