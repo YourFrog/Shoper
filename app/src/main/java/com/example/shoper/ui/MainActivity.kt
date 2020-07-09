@@ -43,7 +43,8 @@ class MainActivity : BaseActivity() {
     }
 
     fun handleAddProduct(item: CategoryItem) {
-        CreateOrUpdateProductActivity.launchForResult(this, REQUEST_NEW_PRODUCT_CODE, item.shopList.category)
+        FastProductAdderActivity.launch(this, item.shopList)
+//        CreateOrUpdateProductActivity.launchForResult(this, REQUEST_NEW_PRODUCT_CODE, item.shopList.category)
     }
 
     fun handleEditCategory(item: CategoryItem) {

@@ -4,29 +4,11 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
             android:id="@+id/main_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-
-            <!-- Komunikat dotyczący usuwania produktów -->
-            <LinearLayout
-                    android:id="@+id/warning_or_remove_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone"
-                    app:layout_constraintTop_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    android:elevation="2dp">
-                    <include
-                            android:id="@+id/warning_separator"
-                            layout="@layout/support_separator"/>
-                    <include
-                            android:id="@+id/warning_of_remove"
-                            layout="@layout/warning_question"/>
-            </LinearLayout>
 
             <!-- Komunikat dotyczący zmianę statusu produktu -->
             <LinearLayout
@@ -49,7 +31,8 @@
             <LinearLayout
                     android:id="@+id/view_pager_container"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
                     android:orientation="vertical">
 
                     <androidx.viewpager2.widget.ViewPager2
@@ -70,14 +53,14 @@
                             android:elevation="5dp"/>
             </LinearLayout>
 
+
+            <!-- Przycisk na dole -->
             <LinearLayout
                     android:id="@+id/products_container"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:visibility="gone">
-
-            <!-- Przycisk na dole -->
+                    android:visibility="visible">
                 <LinearLayout
                     android:id="@+id/buttons_container"
                     android:layout_width="match_parent"
@@ -124,6 +107,23 @@
                         </LinearLayout>
                 </LinearLayout>
 
+                <!-- Komunikat dotyczący usuwania produktów -->
+                <LinearLayout
+                    android:id="@+id/warning_or_remove_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:elevation="2dp">
+                    <include
+                            android:id="@+id/warning_separator"
+                            layout="@layout/support_separator"/>
+                    <include
+                            android:id="@+id/warning_of_remove"
+                            layout="@layout/warning_question"/>
+                </LinearLayout>
             </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </layout>

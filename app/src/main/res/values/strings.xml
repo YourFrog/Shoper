@@ -85,6 +85,9 @@
     <string name="exit_clone_message_no">Pozostań</string>
     <string name="error_clone_empty_list">Kopiowana lista nie może być pusta. Zaznacz przynajmniej jeden element.</string>
 
+    <string name="search_query_hint">Wprowadź nazwę produktu</string>
+    <string name="no_result">Brak wyników wyszukiwania</string>
+
     <string name="local_ean_not_found">Nie oznaleziono kodu %s. Czy chcesz go wprowadzić do aplikacji?</string>
     <string name="button_complete">Zakończ</string>
     <string name="ok">OK</string>

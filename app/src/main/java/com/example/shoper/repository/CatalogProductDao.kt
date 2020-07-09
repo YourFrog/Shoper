@@ -12,4 +12,8 @@ interface CatalogProductDao: AbstractDao<CatalogProduct> {
     @Transaction
     @Query("SELECT * FROM catalog_product WHERE ean = :ean")
     fun oneByEan(ean: String): Maybe<CatalogProduct>
+
+    @Transaction
+    @Query("SELECT * FROM catalog_product WHERE name LIKE '%' || :phrase || '%' OR UPPER(name) LIKE '%' || :phrase || '%'")
+    fun searchByName(phrase: String): Single<List<CatalogProduct>>
 }
